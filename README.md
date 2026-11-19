@@ -153,9 +153,8 @@ y en la cinta queda `wᴿ`. Esta máquina sí usa la caché del estado.
 
 ## Video
 
-Video: (pendiente)
+Video: [(Video en youtube)](https://youtu.be/f2RxisPB31c)
 
 ## Integrantes
 
-- Nombre 1
-- Nombre 2
+- Mariana Castañeda
