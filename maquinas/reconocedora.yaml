@@ -1,0 +1,70 @@
+# Máquina reconocedora del lenguaje L = { a^n b^n c^n | n >= 1 }.
+# No es libre de contexto, por eso hace falta una máquina de Turing y no un PDA.
+#
+# Idea general: en cada vuelta marca una 'a' como X, viaja a la derecha y marca
+# una 'b' como Y y una 'c' como Z, y regresa al inicio para repetir. Cuando ya
+# no quedan 'a' sin marcar, revisa que lo que sigue sean solo Y y Z (ni más
+# b's/c's sueltas ni símbolos de otro tipo). La caché no se usa, siempre queda
+# en blank.
+#
+# Estados:
+#   q0 -> busca la siguiente 'a' sin marcar (o pasa a revisar si ya no hay)
+#   q1 -> ya marcó la 'a', viaja a la derecha buscando la 'b' que le toca
+#   q2 -> ya marcó la 'b', viaja a la derecha buscando la 'c' que le toca
+#   q3 -> ya marcó la 'c', regresa hasta la última X para empezar otra vuelta
+#   q4 -> ya no hay 'a': revisa que el resto sean solo Y y Z
+#   q5 -> estado final, la cadena se acepta
+q_states:
+  q_list: ['q0', 'q1', 'q2', 'q3', 'q4', 'q5']
+  initial: 'q0'
+  final: 'q5'
+alphabet:
+  - a
+  - b
+  - c
+tape_alphabet:
+  - a
+  - b
+  - c
+  - X
+  - Y
+  - Z
+  -            # blank
+delta:
+  - params: {initial_state: 'q0', mem_cache_value: , tape_input: a}
+    output: {final_state: 'q1', mem_cache_value: , tape_output: X, tape_displacement: R}
+  - params: {initial_state: 'q0', mem_cache_value: , tape_input: Y}
+    output: {final_state: 'q4', mem_cache_value: , tape_output: Y, tape_displacement: R}
+  - params: {initial_state: 'q1', mem_cache_value: , tape_input: a}
+    output: {final_state: 'q1', mem_cache_value: , tape_output: a, tape_displacement: R}
+  - params: {initial_state: 'q1', mem_cache_value: , tape_input: Y}
+    output: {final_state: 'q1', mem_cache_value: , tape_output: Y, tape_displacement: R}
+  - params: {initial_state: 'q1', mem_cache_value: , tape_input: b}
+    output: {final_state: 'q2', mem_cache_value: , tape_output: Y, tape_displacement: R}
+  - params: {initial_state: 'q2', mem_cache_value: , tape_input: b}
+    output: {final_state: 'q2', mem_cache_value: , tape_output: b, tape_displacement: R}
+  - params: {initial_state: 'q2', mem_cache_value: , tape_input: Z}
+    output: {final_state: 'q2', mem_cache_value: , tape_output: Z, tape_displacement: R}
+  - params: {initial_state: 'q2', mem_cache_value: , tape_input: c}
+    output: {final_state: 'q3', mem_cache_value: , tape_output: Z, tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: , tape_input: a}
+    output: {final_state: 'q3', mem_cache_value: , tape_output: a, tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: , tape_input: b}
+    output: {final_state: 'q3', mem_cache_value: , tape_output: b, tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: , tape_input: Y}
+    output: {final_state: 'q3', mem_cache_value: , tape_output: Y, tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: , tape_input: Z}
+    output: {final_state: 'q3', mem_cache_value: , tape_output: Z, tape_displacement: L}
+  - params: {initial_state: 'q3', mem_cache_value: , tape_input: X}
+    output: {final_state: 'q0', mem_cache_value: , tape_output: X, tape_displacement: R}
+  - params: {initial_state: 'q4', mem_cache_value: , tape_input: Y}
+    output: {final_state: 'q4', mem_cache_value: , tape_output: Y, tape_displacement: R}
+  - params: {initial_state: 'q4', mem_cache_value: , tape_input: Z}
+    output: {final_state: 'q4', mem_cache_value: , tape_output: Z, tape_displacement: R}
+  - params: {initial_state: 'q4', mem_cache_value: , tape_input: }
+    output: {final_state: 'q5', mem_cache_value: , tape_output: , tape_displacement: S}
+simulation_strings:
+  - aabbcc
+  - aaabbbccc
+  - aabbbcc
+  - abcabc
